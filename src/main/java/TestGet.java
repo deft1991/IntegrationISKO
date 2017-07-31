@@ -7,9 +7,9 @@ import beans.ISKO.FormLine;
 import beans.ISKO.FormReportISKO;
 import beans.ISKO.FormTable;
 import dao.InputData;
-import org.hibernate.Query;
 import org.hibernate.QueryException;
 import org.hibernate.Session;
+import org.hibernate.query.Query;
 import org.hibernate.resource.transaction.spi.TransactionStatus;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -17,7 +17,6 @@ import org.json.JSONObject;
 
 import javax.persistence.NoResultException;
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -28,7 +27,6 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Properties;
 
 //import org.hibernate.query.Query;
 
@@ -47,11 +45,13 @@ public class TestGet {
 
     public static void main(String[] args) {
         try {
-            FileInputStream fis = new FileInputStream("src/main/resources/config.properties");
-            Properties prop = new Properties();
-            prop.load(fis);
-            String request = prop.getProperty("URL");
-            //todo получаем все коды формы
+            // не могу в мавене присоеденить чтение из файла config.properties
+//            FileInputStream fis = new FileInputStream("src/main/resources/config.properties");
+//            Properties prop = new Properties();
+//            prop.load(fis);
+//            String request = prop.getProperty("URL");
+            String request = "http://172.21.10.31:8082/ExportFromIskoToPrpu/Service1.svc/ExportDataToPRPU";
+            // получаем все коды формы
             List<String> listCodeFormISKO = getCodeFormISKO(session);
             for (String codeFormISKO : listCodeFormISKO) {
                 String urlParameters = "?"
@@ -178,19 +178,19 @@ public class TestGet {
         Query queryFindValue = session.createQuery("from DocumentValue where formDocument = :formDocument");
         queryFindValue.setParameter("formDocument", fd);
         session.beginTransaction();
-        if (!isChangeAction || queryFindValue.getResultList().isEmpty()) {
+//        if (!isChangeAction || queryFindValue.getResultList().isEmpty()) {
             session.save(dv);
-            isChangeAction = true;
-        } else {
-            DocumentValue documentValue = (DocumentValue) queryFindValue.getSingleResult();
-            documentValue.setDocumentAttribute(dv.getDocumentAttribute());
-            documentValue.setFormDocument(dv.getFormDocument());
-            documentValue.setValueLine(dv.getValueLine());
-            documentValue.setValueNumber(dv.getValueNumber());
-            documentValue.setValueDate(dv.getValueDate());
-            session.update(documentValue);
+//            isChangeAction = true;
+//        } else {
+//            DocumentValue documentValue = (DocumentValue) queryFindValue.getSingleResult();
+//            documentValue.setDocumentAttribute(dv.getDocumentAttribute());
+//            documentValue.setFormDocument(dv.getFormDocument());
+//            documentValue.setValueLine(dv.getValueLine());
+//            documentValue.setValueNumber(dv.getValueNumber());
+//            documentValue.setValueDate(dv.getValueDate());
+//            session.update(documentValue);
 
-        }
+//        }
         if (session.getTransaction().getStatus().equals(TransactionStatus.ACTIVE)) {
             session.flush();
             session.getTransaction().commit();
