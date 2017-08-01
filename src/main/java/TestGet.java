@@ -17,16 +17,19 @@ import org.json.JSONObject;
 
 import javax.persistence.NoResultException;
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 
 //import org.hibernate.query.Query;
 
@@ -46,17 +49,28 @@ public class TestGet {
     public static void main(String[] args) {
         try {
             // не могу в мавене присоеденить чтение из файла config.properties
-//            FileInputStream fis = new FileInputStream("src/main/resources/config.properties");
-//            Properties prop = new Properties();
-//            prop.load(fis);
-//            String request = prop.getProperty("URL");
-            String request = "http://172.21.10.31:8082/ExportFromIskoToPrpu/Service1.svc/ExportDataToPRPU";
-            // получаем все коды формы
-            List<String> listCodeFormISKO = getCodeFormISKO(session);
+            FileInputStream fis = new FileInputStream("src/main/resources/config.properties");
+            Properties prop = new Properties();
+            prop.load(fis);
+            String request = prop.getProperty("URL");
+            String formCode = prop.getProperty("formCode");
+            String regionCode = prop.getProperty("regionCode");
+            String date = prop.getProperty("date");
+            List<String> listCodeFormISKO = new ArrayList<>();
+            if (formCode != null) {
+                listCodeFormISKO.add(formCode);
+            } else {
+                // получаем все коды формы если код не пришел
+                listCodeFormISKO = getCodeFormISKO(session);
+            }
             for (String codeFormISKO : listCodeFormISKO) {
-                String urlParameters = "?"
-                        + "formCode=" + codeFormISKO + "&"
-                        + "dateTo=" + Util.parseDateToStringByFormat(new Date(2017 - 1900, 06, 26), "yyyy-MM-dd");
+                String urlParameters = "?" + "formCode=" + codeFormISKO;
+                if (regionCode != null) {
+                    urlParameters += "&regionCode=" + regionCode;
+                }
+                if (date != null) {
+                    urlParameters += "&dateTo=" + date;
+                }
 
                 // получение JSONArray по URl
                 JSONArray jsonArray = readJsonFromUrl(request + urlParameters);
@@ -68,8 +82,7 @@ public class TestGet {
                     // получаем форму ИСКО по входным данным
                     Query queryFormReportISKO = session.createQuery("from FormReportISKO where formCode = :formCode");
                     queryFormReportISKO.setParameter("formCode", inputData.getFormCode());
-//                    FormReportISKO formReportISKO = (FormReportISKO) queryFormReportISKO.getSingleResult();
-                    FormReportISKO formReportISKO = (FormReportISKO) queryFormReportISKO.uniqueResult();
+                    FormReportISKO formReportISKO = (FormReportISKO) queryFormReportISKO.getSingleResult();
                     // ищем записи в таблице FormDocument, если есть и дата измен больше чем в БД то апдэйтим,
                     // если записи нет то создаем
                     List<?> listFormDocuments = getListOfFormDocuments(inputData, formReportISKO);
@@ -110,8 +123,9 @@ public class TestGet {
                     createOrUpdateDocumetValueObj(inputData, documentAttributeFromBd, formDocument);
                 }
                 System.out.println("Session close");
+                System.exit(0);
             }
-        } catch (QueryException | NoResultException | ParseException | IOException e) {
+        } catch (QueryException | NoResultException | IOException e) {
             if (dv != null)
                 session.delete(dv);
             if (fd != null)
@@ -172,15 +186,29 @@ public class TestGet {
         dv = new DocumentValue();
         dv.setDocumentAttribute(documentAttributeFromBd);
         dv.setFormDocument(formDocument);
-        if (!inputData.getValue().toString().equals(""))
-            dv.setValueNumber(Double.parseDouble(inputData.getValue().toString()));
+        if (!inputData.getValue().toString().equals("")) {
+            try {
+                Date d = Util.parseStringToDateByFormat(inputData.getValue().toString(), "yyyy-MM-dd");
+                dv.setValueDate(new Timestamp(d.getTime()));
+            } catch (ParseException e) {
+                // просто переходим к следующему элементу
+            }
+            try {
+                Double d = Double.parseDouble(inputData.getValue().toString());
+                dv.setValueNumber(d);
+
+            } catch (NumberFormatException e) {
+                // если не парсится и на число значит это строка
+                dv.setValueLine(inputData.getValue().toString());
+            }
+        }
 
         Query queryFindValue = session.createQuery("" +
                 "from DocumentValue " +
                 "where documentAttribute = :documentAttribute " +
                 "and formDocument = :formDocument");
-            queryFindValue.setParameter("documentAttribute", documentAttributeFromBd);
-            queryFindValue.setParameter("formDocument", formDocument);
+        queryFindValue.setParameter("documentAttribute", documentAttributeFromBd);
+        queryFindValue.setParameter("formDocument", formDocument);
         session.beginTransaction();
         if (queryFindValue.getResultList().isEmpty()) {
             session.save(dv);
