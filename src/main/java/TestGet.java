@@ -34,7 +34,7 @@ public class TestGet {
     private static Session session;
     private static FormDocument fd;
     private static DocumentValue dv;
-    private static boolean isChangeAction = false;
+//    private static boolean isChangeAction = false;
 
     static {
         // создаем коннект к БД (сессию для хибера)
@@ -175,22 +175,24 @@ public class TestGet {
         if (!inputData.getValue().toString().equals(""))
             dv.setValueNumber(Double.parseDouble(inputData.getValue().toString()));
 
-        Query queryFindValue = session.createQuery("from DocumentValue where formDocument = :formDocument");
-        queryFindValue.setParameter("formDocument", fd);
+        Query queryFindValue = session.createQuery("" +
+                "from DocumentValue " +
+                "where documentAttribute = :documentAttribute " +
+                "and formDocument = :formDocument");
+            queryFindValue.setParameter("documentAttribute", documentAttributeFromBd);
+            queryFindValue.setParameter("formDocument", formDocument);
         session.beginTransaction();
-//        if (!isChangeAction || queryFindValue.getResultList().isEmpty()) {
+        if (queryFindValue.getResultList().isEmpty()) {
             session.save(dv);
-//            isChangeAction = true;
-//        } else {
-//            DocumentValue documentValue = (DocumentValue) queryFindValue.getSingleResult();
-//            documentValue.setDocumentAttribute(dv.getDocumentAttribute());
-//            documentValue.setFormDocument(dv.getFormDocument());
-//            documentValue.setValueLine(dv.getValueLine());
-//            documentValue.setValueNumber(dv.getValueNumber());
-//            documentValue.setValueDate(dv.getValueDate());
-//            session.update(documentValue);
-
-//        }
+        } else {
+            DocumentValue documentValue = (DocumentValue) queryFindValue.getSingleResult();
+            documentValue.setDocumentAttribute(dv.getDocumentAttribute());
+            documentValue.setFormDocument(dv.getFormDocument());
+            documentValue.setValueLine(dv.getValueLine());
+            documentValue.setValueNumber(dv.getValueNumber());
+            documentValue.setValueDate(dv.getValueDate());
+            session.update(documentValue);
+        }
         if (session.getTransaction().getStatus().equals(TransactionStatus.ACTIVE)) {
             session.flush();
             session.getTransaction().commit();
@@ -198,7 +200,6 @@ public class TestGet {
     }
 
     private static void createFormDocumentObj(InputData inputData, FormReportISKO formReportISKO) {
-        isChangeAction = false;
         fd = new FormDocument();
         fd.setFormReportISKO(formReportISKO);
         fd.setRegion(inputData.getRgnCode());
@@ -219,7 +220,6 @@ public class TestGet {
         for (Object o : listFormDocuments) {
             fd = (FormDocument) o;
             if (inputData.getDateChange().after(fd.getChangeDate())) {
-                isChangeAction = true;
                 fd.setFormReportISKO(formReportISKO);
                 fd.setRegion(inputData.getRgnCode());
                 fd.setStartDate(inputData.getDateFrom());
