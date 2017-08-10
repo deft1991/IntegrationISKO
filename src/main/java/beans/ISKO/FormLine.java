@@ -7,20 +7,41 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.math.BigInteger;
 
 @Entity
-@Table(name = "form_line", schema = "integrationisko", catalog = "")
+@Table(name = "isko_form_str", schema = "", catalog = "develop")
 public class FormLine {
-    private int id;
-    private Integer number;
-    private String name;
-    private String code;
-    private Byte isSwitchOff;
-    private Integer order;
 
     @Id
     @Column(name = "ID", nullable = false)
     @GeneratedValue(strategy= GenerationType.AUTO)
+    private int id;
+
+    @Basic
+    @Column(name = "version", nullable = true)
+    private BigInteger version;
+
+    @Basic
+    @Column(name = "num", nullable = true)
+    private Integer number;
+
+    @Basic
+    @Column(name = "name", nullable = true, length = 1000)
+    private String name;
+
+    @Basic
+    @Column(name = "code", nullable = true, length = 10)
+    private String code;
+
+    @Basic
+    @Column(name = "disabled", nullable = true)
+    private Byte disabled;
+
+    @Basic
+    @Column(name = "ord", nullable = true)
+    private Integer order;
+
     public int getId() {
         return id;
     }
@@ -29,8 +50,14 @@ public class FormLine {
         this.id = id;
     }
 
-    @Basic
-    @Column(name = "NUMBER", nullable = true)
+    public BigInteger getVersion() {
+        return version;
+    }
+
+    public void setVersion(BigInteger version) {
+        this.version = version;
+    }
+
     public Integer getNumber() {
         return number;
     }
@@ -39,8 +66,6 @@ public class FormLine {
         this.number = number;
     }
 
-    @Basic
-    @Column(name = "NAME", nullable = true, length = 1000)
     public String getName() {
         return name;
     }
@@ -49,8 +74,6 @@ public class FormLine {
         this.name = name;
     }
 
-    @Basic
-    @Column(name = "CODE", nullable = true, length = 10)
     public String getCode() {
         return code;
     }
@@ -59,18 +82,14 @@ public class FormLine {
         this.code = code;
     }
 
-    @Basic
-    @Column(name = "IS_SWITCH_OFF", nullable = true)
-    public Byte getIsSwitchOff() {
-        return isSwitchOff;
+    public Byte getDisabled() {
+        return disabled;
     }
 
-    public void setIsSwitchOff(Byte isSwitchOff) {
-        this.isSwitchOff = isSwitchOff;
+    public void setDisabled(Byte isSwitchOff) {
+        this.disabled = isSwitchOff;
     }
 
-    @Basic
-    @Column(name = "ORDER", nullable = true)
     public Integer getOrder() {
         return order;
     }

@@ -14,43 +14,46 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import java.io.Serializable;
+import java.math.BigInteger;
 import java.util.Date;
 
 @Entity
-@Table(name = "form_document", schema = "integrationisko", catalog = "")
+@Table(name = "isko_form_doc", schema = "", catalog = "develop")
 public class FormDocument implements Serializable {
 
     @Id
-    @Column(name = "ID", nullable = false)
+    @Column(name = "id", nullable = false)
     @GenericGenerator(name="generator", strategy="increment")
     @GeneratedValue(generator="generator")
     private int id;
 
+    @Basic
+    @Column(name = "version", nullable = true)
+    private BigInteger version;
+
     @ManyToOne
-    @JoinColumn(name = "REPORT_FORM_ISKO_ID")
+    @JoinColumn(name = "report_form_id")
     private FormReportISKO formReportISKO;
 
-    @Column(name = "CHANGE_DATE", nullable = true)
+    @Column(name = "change_date", nullable = true)
     @Temporal(TemporalType.DATE)
     private Date changeDate;
 
-    @Column(name = "START_DATE", nullable = true)
+    @Column(name = "begin_date", nullable = true)
     @Temporal(TemporalType.DATE)
     private Date startDate;
 
-    @Column(name = "END_DATE", nullable = true)
+    @Column(name = "end_date", nullable = true)
     @Temporal(TemporalType.DATE)
     private Date endDate;
 
     @Basic
-    @Column(name = "REGION", nullable = true)
+    @Column(name = "rgn", nullable = true)
     private Integer region;
 
     @Basic
-    @Column(name = "IDENTIFI_RECORD_DOC_ISKO", nullable = true)
+    @Column(name = "isko_doc_id", nullable = true)
     private Integer identifiRecordDocIsko;
-
-
 
     public int getId() {
         return id;
@@ -58,6 +61,14 @@ public class FormDocument implements Serializable {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public BigInteger getVersion() {
+        return version;
+    }
+
+    public void setVersion(BigInteger version) {
+        this.version = version;
     }
 
     public FormReportISKO getFormReportISKO() {

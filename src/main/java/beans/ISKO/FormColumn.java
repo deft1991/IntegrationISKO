@@ -7,9 +7,10 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.math.BigInteger;
 
 @Entity
-@Table(name = "form_column", schema = "integrationisko", catalog = "")
+@Table(name = "isko_form_col", schema = "", catalog = "develop")
 public class FormColumn {
 
     @Id
@@ -18,19 +19,23 @@ public class FormColumn {
     private int id;
 
     @Basic
-    @Column(name = "NAME", nullable = false)
+    @Column(name = "version", nullable = false)
+    private BigInteger version;
+
+    @Basic
+    @Column(name = "name", nullable = false)
     private String name;
 
     @Basic
-    @Column(name = "CODE", nullable = true, length = 10)
+    @Column(name = "code", nullable = true, length = 10)
     private String code;
 
     @Basic
-    @Column(name = "IS_SWITCHED_OFF", nullable = true)
-    private Boolean isSwitchedOff;
+    @Column(name = "disabled", nullable = true)
+    private Boolean disabled;
 
     @Basic
-    @Column(name = "ORDER", nullable = true)
+    @Column(name = "ord", nullable = true)
     private Integer order;
 
     public int getId() {
@@ -39,6 +44,14 @@ public class FormColumn {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public BigInteger getVersion() {
+        return version;
+    }
+
+    public void setVersion(BigInteger version) {
+        this.version = version;
     }
 
     public String getName() {
@@ -57,12 +70,12 @@ public class FormColumn {
         this.code = code;
     }
 
-    public Boolean getIsSwitchedOff() {
-        return isSwitchedOff;
+    public Boolean getDisabled() {
+        return disabled;
     }
 
-    public void setIsSwitchedOff(Boolean isSwitchedOff) {
-        this.isSwitchedOff = isSwitchedOff;
+    public void setDisabled(Boolean isSwitchedOff) {
+        this.disabled = isSwitchedOff;
     }
 
     public Integer getOrder() {

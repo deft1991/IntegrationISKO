@@ -10,20 +10,41 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import java.io.Serializable;
+import java.math.BigInteger;
 import java.util.Date;
 
 @Entity
-@Table(name = "form_report_isko", schema = "integrationisko", catalog = "")
+@Table(name = "isko_report_form", schema = "", catalog = "develop")
 public class FormReportISKO implements Serializable {
-    private int id;
-    private String formCode;
-    private String formName;
-    private Date startDate;
-    private Date closeDate;
-    private Byte isSwitchedOff;
 
     @Id
-    @Column(name = "ID", nullable = false)
+    @Column(name = "id", nullable = false)
+    private int id;
+
+    @Basic
+    @Column(name = "version", nullable = true, length = 10)
+    private BigInteger version;
+
+    @Basic
+    @Column(name = "code", nullable = true, length = 10)
+    private String formCode;
+
+    @Basic
+    @Column(name = "name", nullable = true, length = 250)
+    private String formName;
+
+    @Column(name = "begin_date", nullable = true)
+    @Temporal(TemporalType.DATE)
+    private Date startDate;
+
+    @Column(name = "end_date", nullable = true)
+    @Temporal(TemporalType.DATE)
+    private Date closeDate;
+
+    @Basic
+    @Column(name = "disabled", nullable = true)
+    private Byte isSwitchedOff;
+
     @GeneratedValue(strategy= GenerationType.AUTO)
     public int getId() {
         return id;
@@ -33,8 +54,6 @@ public class FormReportISKO implements Serializable {
         this.id = id;
     }
 
-    @Basic
-    @Column(name = "FORM_CODE", nullable = true, length = 10)
     public String getFormCode() {
         return formCode;
     }
@@ -43,8 +62,6 @@ public class FormReportISKO implements Serializable {
         this.formCode = formCode;
     }
 
-    @Basic
-    @Column(name = "FORM_NAME", nullable = true, length = 250)
     public String getFormName() {
         return formName;
     }
@@ -53,8 +70,6 @@ public class FormReportISKO implements Serializable {
         this.formName = formName;
     }
 
-    @Column(name = "START_DATE", nullable = true)
-    @Temporal(TemporalType.DATE)
     public Date getStartDate() {
         return startDate;
     }
@@ -63,8 +78,6 @@ public class FormReportISKO implements Serializable {
         this.startDate = startDate;
     }
 
-    @Column(name = "CLOSE_DATE", nullable = true)
-    @Temporal(TemporalType.DATE)
     public Date getCloseDate() {
         return closeDate;
     }
@@ -73,8 +86,6 @@ public class FormReportISKO implements Serializable {
         this.closeDate = closeDate;
     }
 
-    @Basic
-    @Column(name = "IS_SWITCHED_OFF", nullable = true)
     public Byte getIsSwitchedOff() {
         return isSwitchedOff;
     }

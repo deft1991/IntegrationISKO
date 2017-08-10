@@ -11,10 +11,11 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import java.math.BigInteger;
 import java.sql.Timestamp;
 
 @Entity
-@Table(name = "document_value", schema = "integrationisko", catalog = "")
+@Table(name = "isko_doc_value", schema = "", catalog = "develop")
 public class DocumentValue {
 
     @Id
@@ -23,24 +24,28 @@ public class DocumentValue {
     @GeneratedValue(generator="generator")
     private int id;
 
+    @Basic
+    @Column(name = "version", nullable = true)
+    private BigInteger version;
+
     @ManyToOne
-    @JoinColumn(name = "DOCUMENT_ATTRIBUTE_ID")
+    @JoinColumn(name = "doc_attr_id")
     private DocumentAttribute documentAttribute;
 
     @ManyToOne
-    @JoinColumn(name = "FORM_DOCUMENT_ID")
+    @JoinColumn(name = "form_doc_id")
     private FormDocument formDocument;
 
     @Basic
-    @Column(name = "VALUE_LINE", nullable = true)
+    @Column(name = "value_str", nullable = true)
     private String valueLine;
 
     @Basic
-    @Column(name = "VALUE_NUMBER", nullable = true)
+    @Column(name = "value_num", nullable = true)
     private Double valueNumber;
 
     @Basic
-    @Column(name = "VALUE_DATE", nullable = true)
+    @Column(name = "value_date", nullable = true)
     private Timestamp valueDate;
 
     public int getId() {
@@ -49,6 +54,14 @@ public class DocumentValue {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public BigInteger getVersion() {
+        return version;
+    }
+
+    public void setVersion(BigInteger version) {
+        this.version = version;
     }
 
     public DocumentAttribute getDocumentAttribute() {

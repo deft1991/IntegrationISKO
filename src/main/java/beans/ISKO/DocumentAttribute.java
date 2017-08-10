@@ -9,35 +9,39 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import java.math.BigInteger;
 
 @Entity
-@Table(name = "document_attribute", schema = "integrationisko", catalog = "")
+@Table(name = "isko_doc_attribute", schema = "", catalog = "develop")
 public class DocumentAttribute {
 
     @Id
-    @Column(name = "ID", nullable = false)
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 
+    @Column(name = "version", nullable = false)
+    private BigInteger version;
+
     @ManyToOne
-    @JoinColumn(name = "FORM_TABLE_ID")
+    @JoinColumn(name = "form_table_id")
     private FormTable formTable;
 
     @ManyToOne
-    @JoinColumn(name = "FORM_LINE_ID")
+    @JoinColumn(name = "form_str_id")
     private FormLine formLine;
 
     @ManyToOne
-    @JoinColumn(name = "FORM_COLUMN_ID")
+    @JoinColumn(name = "form_col_id")
     private FormColumn formColumn;
 
     @ManyToOne
-    @JoinColumn(name = "FORM_REPORT_ISKO_ID")
+    @JoinColumn(name = "report_form_id")
     private FormReportISKO formReportISKO;
 
     @Basic
-    @Column(name = "IS_SWITCHED_OFF", nullable = true)
-    private Boolean isSwitchedOff;
+    @Column(name = "disabled", nullable = true)
+    private Boolean disabled;
 
     public int getId() {
         return id;
@@ -47,13 +51,20 @@ public class DocumentAttribute {
         this.id = id;
     }
 
-
-    public Boolean getIsSwitchedOff() {
-        return isSwitchedOff;
+    public BigInteger getVersion() {
+        return version;
     }
 
-    public void setIsSwitchedOff(Boolean isSwitchedOff) {
-        this.isSwitchedOff = isSwitchedOff;
+    public void setVersion(BigInteger version) {
+        this.version = version;
+    }
+
+    public Boolean getDisabled() {
+        return disabled;
+    }
+
+    public void setDisabled(Boolean isSwitchedOff) {
+        this.disabled = isSwitchedOff;
     }
 
     public FormTable getFormTable() {

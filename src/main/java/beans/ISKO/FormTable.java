@@ -7,19 +7,38 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.math.BigInteger;
 
 @Entity
-@Table(name = "form_table", schema = "integrationisko", catalog = "")
+@Table(name = "isko_form_table", schema = "", catalog = "develop")
 public class FormTable {
-    private int id;
-    private String name;
-    private String code;
-    private Byte isSwichedOff;
-    private Integer order;
 
     @Id
-    @Column(name = "ID", nullable = false)
+    @Column(name = "id", nullable = false)
     @GeneratedValue(strategy= GenerationType.AUTO)
+    private int id;
+
+    @Basic
+    @Column(name = "version", nullable = true, length = 250)
+    private BigInteger version;
+
+    @Basic
+    @Column(name = "name", nullable = true, length = 250)
+    private String name;
+
+    @Basic
+    @Column(name = "code", nullable = true, length = 10)
+    private String code;
+
+    @Basic
+    @Column(name = "disabled", nullable = true)
+    private Byte disabled;
+
+    @Basic
+    @Column(name = "ord", nullable = true)
+    private Integer order;
+
+
     public int getId() {
         return id;
     }
@@ -28,8 +47,14 @@ public class FormTable {
         this.id = id;
     }
 
-    @Basic
-    @Column(name = "NAME", nullable = true, length = 250)
+    public BigInteger getVersion() {
+        return version;
+    }
+
+    public void setVersion(BigInteger version) {
+        this.version = version;
+    }
+
     public String getName() {
         return name;
     }
@@ -38,8 +63,6 @@ public class FormTable {
         this.name = name;
     }
 
-    @Basic
-    @Column(name = "CODE", nullable = true, length = 10)
     public String getCode() {
         return code;
     }
@@ -48,18 +71,14 @@ public class FormTable {
         this.code = code;
     }
 
-    @Basic
-    @Column(name = "IS_SWICHED_OFF", nullable = true)
-    public Byte getIsSwichedOff() {
-        return isSwichedOff;
+    public Byte getDisabled() {
+        return disabled;
     }
 
-    public void setIsSwichedOff(Byte isSwichedOff) {
-        this.isSwichedOff = isSwichedOff;
+    public void setDisabled(Byte isSwichedOff) {
+        this.disabled = isSwichedOff;
     }
 
-    @Basic
-    @Column(name = "ORDER", nullable = true)
     public Integer getOrder() {
         return order;
     }
