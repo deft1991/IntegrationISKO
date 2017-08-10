@@ -32,7 +32,7 @@ public class FormTable {
 
     @Basic
     @Column(name = "disabled", nullable = true)
-    private Byte disabled;
+    private Boolean disabled;
 
     @Basic
     @Column(name = "ord", nullable = true)
@@ -71,11 +71,11 @@ public class FormTable {
         this.code = code;
     }
 
-    public Byte getDisabled() {
+    public Boolean getDisabled() {
         return disabled;
     }
 
-    public void setDisabled(Byte isSwichedOff) {
+    public void setDisabled(Boolean isSwichedOff) {
         this.disabled = isSwichedOff;
     }
 

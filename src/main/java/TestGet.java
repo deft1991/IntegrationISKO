@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.math.BigInteger;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.sql.Timestamp;
@@ -184,6 +185,7 @@ public class TestGet {
 
     private static void createOrUpdateDocumetValueObj(InputData inputData, DocumentAttribute documentAttributeFromBd, FormDocument formDocument) {
         dv = new DocumentValue();
+        dv.setVersion(new BigInteger("0"));
         dv.setDocumentAttribute(documentAttributeFromBd);
         dv.setFormDocument(formDocument);
         if (!inputData.getValue().toString().equals("")) {
@@ -219,6 +221,7 @@ public class TestGet {
             documentValue.setValueLine(dv.getValueLine());
             documentValue.setValueNumber(dv.getValueNumber());
             documentValue.setValueDate(dv.getValueDate());
+            documentValue.setVersion(dv.getVersion());
             session.update(documentValue);
         }
         if (session.getTransaction().getStatus().equals(TransactionStatus.ACTIVE)) {
@@ -229,6 +232,7 @@ public class TestGet {
 
     private static void createFormDocumentObj(InputData inputData, FormReportISKO formReportISKO) {
         fd = new FormDocument();
+        fd.setVersion(new BigInteger("0"));
         fd.setFormReportISKO(formReportISKO);
         fd.setRegion(inputData.getRgnCode());
         fd.setStartDate(inputData.getDateFrom());
@@ -248,6 +252,7 @@ public class TestGet {
         for (Object o : listFormDocuments) {
             fd = (FormDocument) o;
             if (inputData.getDateChange().after(fd.getChangeDate())) {
+                fd.setVersion(new BigInteger("0"));
                 fd.setFormReportISKO(formReportISKO);
                 fd.setRegion(inputData.getRgnCode());
                 fd.setStartDate(inputData.getDateFrom());

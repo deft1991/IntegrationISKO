@@ -43,7 +43,7 @@ public class FormReportISKO implements Serializable {
 
     @Basic
     @Column(name = "disabled", nullable = true)
-    private Byte isSwitchedOff;
+    private Boolean isSwitchedOff;
 
     @GeneratedValue(strategy= GenerationType.AUTO)
     public int getId() {
@@ -86,11 +86,11 @@ public class FormReportISKO implements Serializable {
         this.closeDate = closeDate;
     }
 
-    public Byte getIsSwitchedOff() {
+    public Boolean getIsSwitchedOff() {
         return isSwitchedOff;
     }
 
-    public void setIsSwitchedOff(Byte isSwitchedOff) {
+    public void setIsSwitchedOff(Boolean isSwitchedOff) {
         this.isSwitchedOff = isSwitchedOff;
     }
 

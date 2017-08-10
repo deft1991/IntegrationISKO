@@ -36,7 +36,7 @@ public class FormLine {
 
     @Basic
     @Column(name = "disabled", nullable = true)
-    private Byte disabled;
+    private Boolean disabled;
 
     @Basic
     @Column(name = "ord", nullable = true)
@@ -82,11 +82,11 @@ public class FormLine {
         this.code = code;
     }
 
-    public Byte getDisabled() {
+    public Boolean getDisabled() {
         return disabled;
     }
 
-    public void setDisabled(Byte isSwitchOff) {
+    public void setDisabled(Boolean isSwitchOff) {
         this.disabled = isSwitchOff;
     }
 
