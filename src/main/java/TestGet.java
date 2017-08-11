@@ -50,7 +50,7 @@ public class TestGet {
     public static void main(String[] args) {
         try {
             // не могу в мавене присоеденить чтение из файла config.properties
-            FileInputStream fis = new FileInputStream("src/main/resources/config.properties");
+            InputStream fis = TestGet.class.getResourceAsStream("/config.properties");
             Properties prop = new Properties();
             prop.load(fis);
             String request = prop.getProperty("URL");
