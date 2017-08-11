@@ -23,7 +23,7 @@
 
 
     <build>
-        <finalName>dateutils</finalName>
+        <finalName>Golitsyn-PRPU</finalName>
         <plugins>
 
             <!-- download source code in Eclipse, best practice -->

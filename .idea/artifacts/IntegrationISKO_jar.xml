@@ -1,5 +1,5 @@
 <component name="ArtifactManager">
-  <artifact type="jar" name="IntegrationISKO:jar">
+  <artifact type="jar" build-on-make="true" name="IntegrationISKO:jar">
     <output-path>$PROJECT_DIR$/out/artifacts/IntegrationISKO_jar</output-path>
     <root id="archive" name="IntegrationISKO.jar">
       <element id="module-output" name="IntegrationISKO" />
@@ -102,6 +102,11 @@
       <element id="javaee-facet-resources" facet="IntegrationISKO/ejb/EJB" />
       <element id="javaee-facet-resources" facet="IntegrationISKO/javaeeApplication/javaEEApplication" />
       <element id="library" level="project" name="Maven: org.hibernate:hibernate-entitymanager:5.0.1.Final" />
+      <element id="directory" name="META-INF">
+        <element id="module-output" name="IntegrationISKO" />
+      </element>
+      <element id="dir-copy" path="$PROJECT_DIR$/src" />
+      <element id="file-copy" path="$PROJECT_DIR$/src/main/resources/config.properties" />
     </root>
   </artifact>
 </component>

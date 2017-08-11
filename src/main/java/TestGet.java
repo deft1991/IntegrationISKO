@@ -64,75 +64,86 @@ public class TestGet {
                 // получаем все коды формы если код не пришел
                 listCodeFormISKO = getCodeFormISKO(session);
             }
-            for (String codeFormISKO : listCodeFormISKO) {
-                String urlParameters = "?" + "formCode=" + codeFormISKO;
-                if (regionCode != null) {
-                    urlParameters += "&regionCode=" + regionCode;
-                }
-                if (date != null) {
-                    urlParameters += "&dateTo=" + date;
-                }
-
-                // получение JSONArray по URl
-                JSONArray jsonArray = readJsonFromUrl(request + urlParameters);
-                // создаем лист объектов для сохранения в БД
-                List<InputData> inputDataList = createListDto(jsonArray);
-
-                // todo далее этот лист нужно распарсить на данные по бинам
-                for (InputData inputData : inputDataList) {
-                    // получаем форму ИСКО по входным данным
-                    Query queryFormReportISKO = session.createQuery("from FormReportISKO where formCode = :formCode");
-                    queryFormReportISKO.setParameter("formCode", inputData.getFormCode());
-                    FormReportISKO formReportISKO = (FormReportISKO) queryFormReportISKO.getSingleResult();
-                    // ищем записи в таблице FormDocument, если есть и дата измен больше чем в БД то апдэйтим,
-                    // если записи нет то создаем
-                    List<?> listFormDocuments = getListOfFormDocuments(inputData, formReportISKO);
-                    if (!listFormDocuments.isEmpty()) {
-                        updateFormDocumentObj(inputData, formReportISKO, listFormDocuments);
-                    } else {
-                        createFormDocumentObj(inputData, formReportISKO);
-                    }
-                    //если нет записи в справочнике то идем к следуещему входному объекту
-                    Query queryFormTable = session.createQuery("from FormTable where code = :code");
-                    queryFormTable.setParameter("code", inputData.getTableCode());
-                    FormTable formTable = null;
-                    if (!queryFormTable.getResultList().isEmpty()) {
-                        formTable = (FormTable) queryFormTable.getSingleResult();
-                    } else {
-                        continue;
-                    }
-
-                    Query queryCodeLine = session.createQuery("from FormLine where code = :code");
-                    queryCodeLine.setParameter("code", inputData.getLineCode());
-                    FormLine formLine = null;
-                    if (!queryCodeLine.getResultList().isEmpty()) {
-                        formLine = (FormLine) queryCodeLine.getSingleResult();
-                    } else {
-                        continue;
-                    }
-
-                    Query queryFormColumn = session.createQuery("from FormColumn where code = :code");
-                    queryFormColumn.setParameter("code", inputData.getColumnCode());
-                    FormColumn formColumn = null;
-                    if (!queryFormColumn.getResultList().isEmpty()) {
-                        formColumn = (FormColumn) queryFormColumn.getSingleResult();
-                    } else {
-                        continue;
-                    }
-                    DocumentAttribute documentAttributeFromBd = getDocumentAttribute(formReportISKO, formTable, formLine, formColumn);
-                    FormDocument formDocument = getFormDocument(inputData, formReportISKO);
-                    createOrUpdateDocumetValueObj(inputData, documentAttributeFromBd, formDocument);
-                }
-                System.out.println("Session close");
-                System.exit(0);
-            }
+            parseAndSaveData(request, regionCode, date, listCodeFormISKO);
         } catch (QueryException | NoResultException | IOException e) {
             if (dv != null)
                 session.delete(dv);
             if (fd != null)
                 session.delete(fd);
             e.printStackTrace();
+            System.exit(1);
         }
+    }
+
+    private static void parseAndSaveData(String request, String regionCode, String date, List<String> listCodeFormISKO) throws IOException {
+        for (String codeFormISKO : listCodeFormISKO) {
+            List<InputData> inputDataList = getInputData(request, regionCode, date, codeFormISKO);
+
+            for (InputData inputData : inputDataList) {
+                // получаем форму ИСКО по входным данным
+                FormReportISKO formReportISKO = getFormReportISKO(inputData);
+                // ищем записи в таблице FormDocument, если есть и дата измен больше чем в БД то апдэйтим,
+                // если записи нет то создаем
+                List<?> listFormDocuments = getListOfFormDocuments(inputData, formReportISKO);
+                if (!listFormDocuments.isEmpty()) {
+                    updateFormDocumentObj(inputData, formReportISKO, listFormDocuments);
+                } else {
+                    createFormDocumentObj(inputData, formReportISKO);
+                }
+                //если нет записи в справочнике то идем к следуещему входному объекту
+                Query queryFormTable = session.createQuery("from FormTable where code = :code");
+                queryFormTable.setParameter("code", inputData.getTableCode());
+                FormTable formTable = null;
+                if (!queryFormTable.getResultList().isEmpty()) {
+                    formTable = (FormTable) queryFormTable.getSingleResult();
+                } else {
+                    continue;
+                }
+
+                Query queryCodeLine = session.createQuery("from FormLine where code = :code");
+                queryCodeLine.setParameter("code", inputData.getLineCode());
+                FormLine formLine = null;
+                if (!queryCodeLine.getResultList().isEmpty()) {
+                    formLine = (FormLine) queryCodeLine.getSingleResult();
+                } else {
+                    continue;
+                }
+
+                Query queryFormColumn = session.createQuery("from FormColumn where code = :code");
+                queryFormColumn.setParameter("code", inputData.getColumnCode());
+                FormColumn formColumn = null;
+                if (!queryFormColumn.getResultList().isEmpty()) {
+                    formColumn = (FormColumn) queryFormColumn.getSingleResult();
+                } else {
+                    continue;
+                }
+                DocumentAttribute documentAttributeFromBd = getDocumentAttribute(formReportISKO, formTable, formLine, formColumn);
+                FormDocument formDocument = getFormDocument(inputData, formReportISKO);
+                createOrUpdateDocumetValueObj(inputData, documentAttributeFromBd, formDocument);
+            }
+            System.out.println("Session close");
+            System.exit(0);
+        }
+    }
+
+    private static FormReportISKO getFormReportISKO(InputData inputData) {
+        Query queryFormReportISKO = session.createQuery("from FormReportISKO where formCode = :formCode");
+        queryFormReportISKO.setParameter("formCode", inputData.getFormCode());
+        return (FormReportISKO) queryFormReportISKO.getSingleResult();
+    }
+
+    private static List<InputData> getInputData(String request, String regionCode, String date, String codeFormISKO) throws IOException {
+        String urlParameters = "?" + "formCode=" + codeFormISKO;
+        if (regionCode != null) {
+            urlParameters += "&regionCode=" + regionCode;
+        }
+        if (date != null) {
+            urlParameters += "&dateTo=" + date;
+        }
+        // получение JSONArray по URl
+        JSONArray jsonArray = readJsonFromUrl(request + urlParameters);
+        // создаем лист объектов для сохранения в БД
+        return createListDto(jsonArray);
     }
 
     private static List<?> getListOfFormDocuments(InputData inputData, FormReportISKO formReportISKO) {
@@ -215,19 +226,24 @@ public class TestGet {
         if (queryFindValue.getResultList().isEmpty()) {
             session.save(dv);
         } else {
-            DocumentValue documentValue = (DocumentValue) queryFindValue.getSingleResult();
-            documentValue.setDocumentAttribute(dv.getDocumentAttribute());
-            documentValue.setFormDocument(dv.getFormDocument());
-            documentValue.setValueLine(dv.getValueLine());
-            documentValue.setValueNumber(dv.getValueNumber());
-            documentValue.setValueDate(dv.getValueDate());
-            documentValue.setVersion(dv.getVersion());
+            DocumentValue documentValue = createDocumentValueForUpdate(queryFindValue);
             session.update(documentValue);
         }
         if (session.getTransaction().getStatus().equals(TransactionStatus.ACTIVE)) {
             session.flush();
             session.getTransaction().commit();
         }
+    }
+
+    private static DocumentValue createDocumentValueForUpdate(Query queryFindValue) {
+        DocumentValue documentValue = (DocumentValue) queryFindValue.getSingleResult();
+        documentValue.setDocumentAttribute(dv.getDocumentAttribute());
+        documentValue.setFormDocument(dv.getFormDocument());
+        documentValue.setValueLine(dv.getValueLine());
+        documentValue.setValueNumber(dv.getValueNumber());
+        documentValue.setValueDate(dv.getValueDate());
+        documentValue.setVersion(dv.getVersion());
+        return documentValue;
     }
 
     private static void createFormDocumentObj(InputData inputData, FormReportISKO formReportISKO) {
@@ -326,20 +342,6 @@ public class TestGet {
                 e.printStackTrace();
             }
         }
-        //test update table
-//        InputData inputData = new InputData();
-//        inputData.setFormCode("1T");
-//        inputData.setDateFrom(new Date());
-//        inputData.setDateTo(new Date());
-//        inputData.setDateChange(new Date(2018, 10, 23));
-//        inputData.setIdDocIsko(2);
-//        inputData.setTableCode("1");
-//        inputData.setLineCode("87");
-//        inputData.setColumnCode("1");
-//        inputData.setValue(1);
-//        listInpData.add(inputData);
-
-
         System.out.println("listInpData create");
         return listInpData;
     }
