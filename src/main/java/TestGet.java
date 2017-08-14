@@ -62,7 +62,7 @@ public class TestGet {
                 listCodeFormISKO = getCodeFormISKO(session);
             }
             parseAndSaveData(request, regionCode, date, listCodeFormISKO);
-        } catch (QueryException | NoResultException | IOException e) {
+        } catch (ArrayIndexOutOfBoundsException | QueryException | NoResultException | IOException e) {
             if (dv != null)
                 session.delete(dv);
             if (fd != null)
@@ -72,11 +72,11 @@ public class TestGet {
         }
     }
 
-    private static String getCodeByParam(Map<String, String> codesMap, String param) {
+    private static String getCodeByParam(Map<String, String> codesMap, String param) throws ArrayIndexOutOfBoundsException {
         String code = null;
-        if (codesMap.containsKey(param)) {
-            code = codesMap.get(param);
-        }
+            if (codesMap.containsKey(param)) {
+                code = codesMap.get(param);
+            }
         return code;
     }
 
