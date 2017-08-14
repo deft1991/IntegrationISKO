@@ -17,7 +17,6 @@ import org.json.JSONObject;
 
 import javax.persistence.NoResultException;
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -29,8 +28,9 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Properties;
+import java.util.Map;
 
 //import org.hibernate.query.Query;
 
@@ -49,14 +49,11 @@ public class TestGet {
 
     public static void main(String[] args) {
         try {
-            // не могу в мавене присоеденить чтение из файла config.properties
-            InputStream fis = TestGet.class.getResourceAsStream("/config.properties");
-            Properties prop = new Properties();
-            prop.load(fis);
-            String request = prop.getProperty("URL");
-            String formCode = prop.getProperty("formCode");
-            String regionCode = prop.getProperty("regionCode");
-            String date = prop.getProperty("date");
+            Map<String, String> codesMap = parseArgs(args);
+            String request = getCodeByParam(codesMap, "URL");
+            String formCode = getCodeByParam(codesMap, "formCode");
+            String regionCode = getCodeByParam(codesMap, "regionCode");
+            String date = getCodeByParam(codesMap, "date");
             List<String> listCodeFormISKO = new ArrayList<>();
             if (formCode != null) {
                 listCodeFormISKO.add(formCode);
@@ -73,6 +70,25 @@ public class TestGet {
             e.printStackTrace();
             System.exit(1);
         }
+    }
+
+    private static String getCodeByParam(Map<String, String> codesMap, String param) {
+        String code = null;
+        if (codesMap.containsKey(param)) {
+            code = codesMap.get(param);
+        }
+        return code;
+    }
+
+    private static Map<String, String> parseArgs(String[] args) {
+        Map<String, String> codesMap = new HashMap<>();
+        if (args != null) {
+            for (String code : args) {
+                String[] codeValue = code.split("=");
+                codesMap.put(codeValue[0], codeValue[1]);
+            }
+        }
+        return codesMap;
     }
 
     private static void parseAndSaveData(String request, String regionCode, String date, List<String> listCodeFormISKO) throws IOException {
@@ -285,15 +301,15 @@ public class TestGet {
         }
     }
 
-    // todo нужно сделать селект объекта который сетили и удалить из БД
-
-    private static void deleteFormTableFromBD() {
-        session.beginTransaction();
-        session.delete(fd);
-        if (session.getTransaction().getStatus().equals(TransactionStatus.ACTIVE)) {
-            session.getTransaction().commit();
-        }
-    }
+//    // todo нужно сделать селект объекта который сетили и удалить из БД
+//
+//    private static void deleteFormTableFromBD() {
+//        session.beginTransaction();
+//        session.delete(fd);
+//        if (session.getTransaction().getStatus().equals(TransactionStatus.ACTIVE)) {
+//            session.getTransaction().commit();
+//        }
+//    }
 
     private static List<String> getCodeFormISKO(Session session) {
         // открываем транзакцию
